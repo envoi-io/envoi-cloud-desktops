@@ -20,9 +20,21 @@ class EnvoiDevelopmentMacOsCommand(CliCommand):
         **COMMON_CFN_PARAMS,
         **COMMON_PARAMS,
         **COMMON_EC2_LAUNCH_PARAMS,
+        "instance-id": {
+            'help': 'Instance ID',
+            'default': None
+        },
         "instance-name": {
             'help': 'Instance Name',
             'default': 'envoi-dev-macos'
+        },
+        "instance-type": {
+            'help': 'Instance Type',
+            'default': 'mac2-m2pro.metal'
+        },
+        "host-id": {
+            'help': 'Host ID',
+            'default': None
         },
     }
 

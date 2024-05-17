@@ -29,6 +29,7 @@ def envoi_dev_mac_os_command_handler(opts=None):
     instance_type = opts.instance_type
     instance_profile_arn = opts.instance_profile_arn
     key_name = opts.key_pair_name
+    instance_name = opts.instance_name
 
     if not ami_id:
         # ami = determine_latest_macos_ami()
