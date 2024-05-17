@@ -1,7 +1,9 @@
 #!/bin/bash
-if ! command -v brew &> /dev/null
-  brew update
+if command -v brew &> /dev/null
 then
+  brew update
+else
+  # Not Found - Install
   NONINTERACTIVE=1 /bin/bash -c \
      "$(curl -fsSL \
         https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
@@ -51,14 +53,14 @@ brew install --cask mongodb-compass
 brew install --cask nosql-workbench
 brew install --cask visual-studio-code
 
-brew install --cask obs
-brew install --cask streamlabs
-brew install --cask github
-brew install --cask royal-tsx
 brew install --cask dcv-viewer
-brew install --cask mysqlworkbench
-#   PostgreSQL
+brew install --cask github
 brew install --cask mongodb-compass
+brew install --cask mysqlworkbench
+brew install --cask obs
+brew install --cask pgadmin4
+brew install --cask royal-tsx
+brew install --cask streamlabs
 
 wget --no-check-certificate \
 https://download.tizen.org/sdk/Installer/tizen-studio_5.6/web-ide_Tizen_Studio_5.6_macos-64.dmg \
