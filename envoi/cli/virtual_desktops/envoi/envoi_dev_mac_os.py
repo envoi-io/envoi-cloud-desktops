@@ -40,7 +40,8 @@ def envoi_dev_mac_os_command_handler(opts=None):
         instance_type = dedicated_host.instance_type()
     else:
         dedicated_host.launch(instance_type=instance_type)
-        dedicated_host.wait()
+
+    dedicated_host.wait()
 
     instance = Ec2Instance(instance_id=instance_id)
     if not instance.instance_id:
@@ -124,6 +125,7 @@ class Ec2Instance:
 
     def launch(self, **kwargs):
         ami_id = kwargs.get('ami_id')
+        instance_name = kwargs.get('instance_name')
         instance_profile_arn = kwargs.get('instance_profile_arn')
         instance_type = kwargs.get('instance_type')
         key_name = kwargs.get('key_name')
