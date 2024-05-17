@@ -45,13 +45,19 @@ def envoi_dev_mac_os_command_handler(opts=None):
 
     instance = Ec2Instance(instance_id=instance_id)
     if not instance.instance_id:
-        instance.launch(
-            ami_id=ami_id,
-            host_id=dedicated_host.host_id,
-            instance_profile_arn=instance_profile_arn,
-            instance_type=instance_type,
-            key_name=key_name
-        )
+        launch_args = {
+            'ami_id': ami_id,
+            'host_id': dedicated_host.host_id,
+            'instance_type': instance_type,
+            'key_name': key_name
+        }
+        if instance_profile_arn:
+            launch_args['instance_profile_arn'] = instance_profile_arn
+
+        if instance_name:
+            launch_args['instance_name'] = instance_name
+
+        instance.launch(**launch_args)
     instance.wait()
     print("Connection command: ", instance.connection_string())
 
@@ -130,16 +136,31 @@ class Ec2Instance:
         instance_type = kwargs.get('instance_type')
         key_name = kwargs.get('key_name')
 
-        response = self.ec2.run_instances(
-            ImageId=ami_id,
-            InstanceType=instance_type,
-            KeyName=key_name,
-            IamInstanceProfile={
+        run_instance_args = {
+            'ImageId': ami_id,
+            'InstanceType': instance_type,
+            'KeyName': key_name,
+            'MaxCount': 1,
+            'MinCount': 1
+        }
+        if instance_profile_arn:
+            run_instance_args['IamInstanceProfile'] = {
                 'Arn': instance_profile_arn
-            },
-            MaxCount=1,
-            MinCount=1
-        )
+            }
+
+        if instance_name:
+            run_instance_args['TagSpecifications'] = [
+                {
+                    'ResourceType': 'instance',
+                    'Tags': [
+                        {
+                            'Key': 'Name',
+                            'Value': instance_name
+                        }
+                    ]
+                }
+            ]
+        response = self.ec2.run_instances(**run_instance_args)
         self.instance = response['Instances'][0]
         self.instance_id = self.instance['InstanceId']
 

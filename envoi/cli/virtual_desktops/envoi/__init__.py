@@ -20,6 +20,10 @@ class EnvoiDevelopmentMacOsCommand(CliCommand):
         **COMMON_CFN_PARAMS,
         **COMMON_PARAMS,
         **COMMON_EC2_LAUNCH_PARAMS,
+        "instance-name": {
+            'help': 'Instance Name',
+            'default': 'envoi-dev-macos'
+        },
     }
 
     def run(self, opts=None):
