@@ -15,7 +15,9 @@ brew install wget
 brew install mas
 brew install jq
 brew install asdf
-. /opt/homebrew/opt/asdf/libexec/asdf.sh
+asdf_exec_path=$(brew --prefix asdf)/libexec/asdf.sh
+echo -e "\n. ${asdf_exec_path}" >> ${ZDOTDIR:-~}/.zshrc
+. "${asdf_exec_path}"
 
 asdf plugin add awscli
 asdf install awscli latest:2
