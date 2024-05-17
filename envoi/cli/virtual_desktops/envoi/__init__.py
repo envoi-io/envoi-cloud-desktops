@@ -14,7 +14,7 @@ class EnvoiDevelopmentLinuxCommand(LaunchUsingCloudFormationCliCommand):
     }
 
 
-class EnvoiDevelopmentMacOsCommand(LaunchUsingCloudFormationCliCommand):
+class EnvoiDevelopmentMacOsCommand(CliCommand):
     DESCRIPTION = "Envoi Development MacOS Command"
     PARAMS = {
         **COMMON_CFN_PARAMS,
