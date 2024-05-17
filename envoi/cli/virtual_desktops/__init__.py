@@ -1,7 +1,7 @@
 import sys
 
 from envoi.cli import CliApp
-# from envoi.cli.virtual_desktops.envoi import EnvoiCommand
+from envoi.cli.virtual_desktops.envoi import EnvoiCommand
 from envoi.cli.virtual_desktops.hp_anyware import HpAnywareCommand
 
 import logging
@@ -20,7 +20,7 @@ class EnvoiVirtualDesktopsCli(CliApp):
         },
     }
     SUBCOMMANDS = {
-        # 'envoi': EnvoiCommand,
+        'envoi': EnvoiCommand,
         'hp-anyware': HpAnywareCommand
     }
 
