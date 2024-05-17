@@ -13,6 +13,7 @@ fi
 
 brew install wget
 brew install mas
+brew install jq
 brew install asdf
 . /opt/homebrew/opt/asdf/libexec/asdf.sh
 
@@ -68,8 +69,7 @@ https://download.tizen.org/sdk/Installer/tizen-studio_5.6/web-ide_Tizen_Studio_5
 
 brew install ffmpeg
 
-# Aspera CLI - @TODO - Update to not use system Ruby
-sudo gem install aspera-cli
+gem install aspera-cli
 
 sudo mkdir -p /opt/envoi
 sudo chown ec2-user:staff /opt/envoi
