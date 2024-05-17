@@ -13,6 +13,14 @@ COMMON_PARAMS = {
 }
 
 COMMON_EC2_LAUNCH_PARAMS = {
+    "ami-id": {
+        'help': 'AMI ID',
+        'default': None
+    },
+    "instance-profile-arn": {
+        'help': 'Instance Profile ARN',
+        'default': None
+    },
     "instance-type": {
         'help': 'Instance Type',
         'default': None
