@@ -17,7 +17,6 @@ class EnvoiDevelopmentLinuxCommand(LaunchUsingCloudFormationCliCommand):
 class EnvoiDevelopmentMacOsCommand(CliCommand):
     DESCRIPTION = "Envoi Development MacOS Command"
     PARAMS = {
-        **COMMON_CFN_PARAMS,
         **COMMON_PARAMS,
         **COMMON_EC2_LAUNCH_PARAMS,
         "instance-id": {
@@ -35,6 +34,10 @@ class EnvoiDevelopmentMacOsCommand(CliCommand):
         "host-id": {
             'help': 'Host ID',
             'default': None
+        },
+        "host-availability-zone": {
+            'help': 'Host Availability Zone',
+            'default': 'us-east-1a'
         },
     }
 
