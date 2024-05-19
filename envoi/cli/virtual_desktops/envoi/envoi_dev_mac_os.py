@@ -22,46 +22,27 @@ def determine_latest_macos_ami():
 
 
 def envoi_dev_mac_os_command_handler(opts=None):
-
-    host_id = opts.host_id
-    ami_id = opts.ami_id
-    instance_id = opts.instance_id
-    instance_type = opts.instance_type
-    instance_profile_arn = opts.instance_profile_arn
-    key_name = opts.key_pair_name
-    instance_name = opts.instance_name
-
-    if not ami_id:
-        # ami = determine_latest_macos_ami()
-        # ami_id = ami['ImageId']
-        ami_id = 'ami-031445a67a8e9b092'
-
-    dedicated_host = DedicatedHost(host_id=host_id)
-    if dedicated_host.host_id:
-        instance_type = dedicated_host.instance_type()
-    else:
-        dedicated_host.launch(instance_type=instance_type)
-
+    ami_id = opts.ami_id or 'ami-031445a67a8e9b092'
+    dedicated_host = DedicatedHost(host_id=opts.host_id, host_availability_zone=opts.host_availability_zone)
+    if not dedicated_host.host_id:
+        dedicated_host.launch(instance_type=opts.instance_type)
+    instance_type = dedicated_host.instance_type()
     dedicated_host.wait()
 
-    instance = Ec2Instance(instance_id=instance_id)
+    instance = Ec2Instance(instance_id=opts.instance_id)
     if not instance.instance_id:
         launch_args = {
             'ami_id': ami_id,
             'host_id': dedicated_host.host_id,
             'instance_type': instance_type,
-            'key_name': key_name
+            'key_name': opts.key_pair_name,
+            'instance_iam_role_id': opts.instance_iam_role_id,
+            'instance_name': opts.instance_name,
+            'subnet_id': opts.subnet_id
         }
-        if instance_profile_arn:
-            launch_args['instance_profile_arn'] = instance_profile_arn
-
-        if instance_name:
-            launch_args['instance_name'] = instance_name
-
         instance.launch(**launch_args)
     instance.wait()
     print("Connection command: ", instance.connection_string())
-
 
 
 class DedicatedHost:
@@ -82,10 +63,7 @@ class DedicatedHost:
         self.host = self.describe()
 
     def instance_type(self):
-        if 'Instances' in self.host and len(self.host['Instances']) > 0:
-            return self.host['Instances'][0]['InstanceType']
-        else:
-            return None
+        return self.host['HostProperties']['InstanceType']
 
     def describe(self):
         response = self.ec2.describe_hosts(HostIds=[self.host_id])
@@ -132,35 +110,53 @@ class Ec2Instance:
 
     def launch(self, **kwargs):
         ami_id = kwargs.get('ami_id')
+        host_id = kwargs.get('host_id')
         instance_name = kwargs.get('instance_name')
-        instance_profile_arn = kwargs.get('instance_profile_arn')
+        instance_iam_role_id = kwargs.get('instance_iam_role_id')
         instance_type = kwargs.get('instance_type')
         key_name = kwargs.get('key_name')
+        security_group_id = kwargs.get('security_group_id')
+        subnet_id = kwargs.get('subnet_id')
+        tags = kwargs.get('tags', [])
+        user_data = kwargs.get('user_data')
 
         run_instance_args = {
             'ImageId': ami_id,
             'InstanceType': instance_type,
-            'KeyName': key_name,
             'MaxCount': 1,
             'MinCount': 1
         }
-        if instance_profile_arn:
+        if host_id:
+            run_instance_args['Placement'] = {'HostId': host_id}
+
+        if instance_iam_role_id:
+            if instance_iam_role_id.startswith('arn:aws:iam::'):
+                instance_iam_role_id_key_name = 'Arn'
+            else:
+                instance_iam_role_id_key_name = 'Name'
             run_instance_args['IamInstanceProfile'] = {
-                'Arn': instance_profile_arn
+                instance_iam_role_id_key_name: instance_iam_role_id
             }
 
         if instance_name:
-            run_instance_args['TagSpecifications'] = [
-                {
-                    'ResourceType': 'instance',
-                    'Tags': [
-                        {
-                            'Key': 'Name',
-                            'Value': instance_name
-                        }
-                    ]
-                }
-            ]
+            tags.append({'Key': 'Name', 'Value': instance_name})
+
+        if key_name:
+            run_instance_args['KeyName'] = key_name
+
+        if security_group_id:
+            security_group_ids = security_group_id.split(',')
+            run_instance_args['SecurityGroupIds'] = security_group_ids
+
+        if subnet_id:
+            run_instance_args['SubnetId'] = subnet_id
+
+        if user_data:
+            run_instance_args['UserData'] = user_data
+
+        run_instance_args['TagSpecifications'] = [
+            {'ResourceType': 'instance', 'Tags': tags}
+        ]
         response = self.ec2.run_instances(**run_instance_args)
         self.instance = response['Instances'][0]
         self.instance_id = self.instance['InstanceId']
@@ -181,44 +177,3 @@ class Ec2Instance:
         public_dns_name = self.instance['PublicDnsName']
         key_name = self.instance['KeyName']
         return f"ssh -i {key_name} ec2-user@{public_dns_name}"
-
-
-class EnvoiDevelopmentMacOsInstanceLauncher:
-
-    def __init__(self):
-        pass
-
-    def main(self, **kwargs):
-        host_id = kwargs.get('host-id', None)
-        instance_id = kwargs.get('instance-id', None)
-        instance_type = kwargs.get('instance-type', 'mac2-m2pro.metal')
-
-        instance_profile_arn = kwargs.get('instance-profile-arn', None)
-        key_name = kwargs.get('key-name')
-        ami_id = kwargs.get('ami-id', deteremine_latest_macos_ami())
-
-        # Dedicated instance specified?
-        if host_id:
-            dedicated_host = DedicatedHost(host_id=host_id, instance_type=instance_type)
-        else:
-            dedicated_host = DedicatedHost(instance_type=instance_type)
-            dedicated_host.launch()
-
-        # dedicated_instance_description = dedicated_host.describe()
-
-        # Wait for dedicated instance
-        dedicated_host.wait()
-
-        # Launch instance onto dedicated instance
-        instance = Ec2Instance(instance_id=instance_id)
-
-        instance.launch(
-            ami_id=ami_id,
-            host_id=dedicated_host.host_id,
-            instance_profile_arn=instance_profile_arn,
-            key_name=key_name
-        )
-        instance.wait()
-
-
-

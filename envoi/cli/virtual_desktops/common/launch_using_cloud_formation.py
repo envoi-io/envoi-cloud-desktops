@@ -17,8 +17,12 @@ COMMON_EC2_LAUNCH_PARAMS = {
         'help': 'AMI ID',
         'default': None
     },
-    "instance-profile-arn": {
-        'help': 'Instance Profile ARN',
+    "instance-name": {
+        'help': 'Instance Name',
+        'default': None
+    },
+    "instance-iam-role-id": {
+        'help': 'Instance IAM Role Name or ARN',
         'default': None
     },
     "instance-type": {
@@ -30,7 +34,11 @@ COMMON_EC2_LAUNCH_PARAMS = {
         'default': None
     },
     "security-group-id": {
-        'help': 'Security Group ID',
+        'help': 'Comma separated list of Security Group IDs',
+        'default': None
+    },
+    "subnet-id": {
+        'help': 'Subnet ID',
         'default': None
     },
 }
