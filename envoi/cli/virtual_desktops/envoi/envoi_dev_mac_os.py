@@ -23,9 +23,9 @@ def determine_latest_macos_ami():
 
 def envoi_dev_mac_os_command_handler(opts=None):
     ami_id = opts.ami_id or 'ami-031445a67a8e9b092'
-    dedicated_host = DedicatedHost(host_id=opts.host_id, host_availability_zone=opts.host_availability_zone)
+    dedicated_host = DedicatedHost(host_id=opts.host_id)
     if not dedicated_host.host_id:
-        dedicated_host.launch(instance_type=opts.instance_type)
+        dedicated_host.launch(instance_type=opts.instance_type, availability_zone=opts.host_availability_zone)
     instance_type = dedicated_host.instance_type()
     dedicated_host.wait()
 
@@ -48,10 +48,8 @@ def envoi_dev_mac_os_command_handler(opts=None):
 class DedicatedHost:
     ec2 = boto3.client('ec2')
 
-    def __init__(self, **kwargs):
-        self.host_id = kwargs.get('host_id')
-        if self._host_id:
-            self.host = self.describe()
+    def __init__(self, host_id=None):
+        self.host_id = host_id
 
     @property
     def host_id(self):
@@ -60,7 +58,8 @@ class DedicatedHost:
     @host_id.setter
     def host_id(self, value):
         self._host_id = value
-        self.host = self.describe()
+        if value:
+            self.host = self.describe()
 
     def instance_type(self):
         return self.host['HostProperties']['InstanceType']
@@ -70,10 +69,7 @@ class DedicatedHost:
         hosts = response['Hosts']
         return hosts[0]
 
-    def launch(self, **kwargs):
-        instance_type = kwargs.get('instance_type', 'mac2-m2pro.metal')
-        availability_zone = kwargs.get('availability_zone', 'us-east-1a')
-
+    def launch(self, instance_type='mac2-m2pro.metal', availability_zone='us-east-1a'):
         response = self.ec2.allocate_hosts(
             InstanceType=instance_type,
             Quantity=1,
