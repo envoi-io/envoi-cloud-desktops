@@ -38,6 +38,7 @@ def envoi_dev_mac_os_command_handler(opts=None):
             'key_name': opts.key_pair_name,
             'instance_iam_role_id': opts.instance_iam_role_id,
             'instance_name': opts.instance_name,
+            'security_group_ids': opts.security_group_id,
             'subnet_id': opts.subnet_id
         }
         instance.launch(**launch_args)
@@ -122,6 +123,8 @@ class Ec2Instance:
         subnet_id = kwargs.get('subnet_id')
         tags = kwargs.get('tags', [])
         user_data = kwargs.get('user_data')
+               security_group_ids=None,
+        security_group_ids = security_group_ids or []
 
         run_instance_args = {
             'ImageId': ami_id,
@@ -147,8 +150,10 @@ class Ec2Instance:
         if key_name:
             run_instance_args['KeyName'] = key_name
 
-        if security_group_id:
-            security_group_ids = security_group_id.split(',')
+        if security_group_ids:
+            if isinstance(security_group_ids, str):
+                security_group_ids = security_group_ids.split(',')
+
             run_instance_args['SecurityGroupIds'] = security_group_ids
 
         if subnet_id:
