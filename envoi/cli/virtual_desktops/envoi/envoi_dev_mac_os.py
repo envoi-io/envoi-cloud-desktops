@@ -38,6 +38,8 @@ def envoi_dev_mac_os_command_handler(opts=None):
             'key_name': opts.key_pair_name,
             'instance_iam_role_id': opts.instance_iam_role_id,
             'instance_name': opts.instance_name,
+            'instance_type': instance_type,
+            'key_name': opts.key_pair_name,
             'security_group_ids': opts.security_group_id,
             'subnet_id': opts.subnet_id
         }
@@ -112,18 +114,19 @@ class Ec2Instance:
         instances = response['Reservations'][0]['Instances']
         return instances[0]
 
-    def launch(self, **kwargs):
-        ami_id = kwargs.get('ami_id')
-        host_id = kwargs.get('host_id')
-        instance_name = kwargs.get('instance_name')
-        instance_iam_role_id = kwargs.get('instance_iam_role_id')
-        instance_type = kwargs.get('instance_type')
-        key_name = kwargs.get('key_name')
-        security_group_id = kwargs.get('security_group_id')
-        subnet_id = kwargs.get('subnet_id')
-        tags = kwargs.get('tags', [])
-        user_data = kwargs.get('user_data')
+    def launch(self,
+               ami_id=None,
+               host_id=None,
+               instance_name=None,
+               instance_iam_role_id=None,
+               instance_type=None,
+               key_name=None,
                security_group_ids=None,
+               subnet_id=None,
+               tags=None,
+               user_data=None,
+               ):
+        tags = tags or []
         security_group_ids = security_group_ids or []
 
         run_instance_args = {
