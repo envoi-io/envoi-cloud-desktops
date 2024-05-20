@@ -25,7 +25,8 @@ def envoi_dev_mac_os_command_handler(opts=None):
     ami_id = opts.ami_id or 'ami-031445a67a8e9b092'
     dedicated_host = DedicatedHost(host_id=opts.host_id)
     if not dedicated_host.host_id:
-        dedicated_host.launch(instance_type=opts.instance_type, availability_zone=opts.host_availability_zone)
+        dedicated_host.launch(instance_type=opts.instance_type, availability_zone=opts.host_availability_zone,
+                              Name=opts.host_name)
     instance_type = dedicated_host.instance_type()
     dedicated_host.wait()
 
@@ -72,13 +73,22 @@ class DedicatedHost:
         hosts = response['Hosts']
         return hosts[0]
 
-    def launch(self, instance_type='mac2-m2pro.metal', availability_zone='us-east-1a'):
-        response = self.ec2.allocate_hosts(
-            InstanceType=instance_type,
-            Quantity=1,
-            AvailabilityZone=availability_zone,
-            AutoPlacement='on'
-        )
+    def launch(self, instance_type='mac2-m2pro.metal', availability_zone='us-east-1a', name=None):
+        launch_args = {
+            'InstanceType': instance_type,
+            'Quantity': 1,
+            'AvailabilityZone': availability_zone,
+            'AutoPlacement': 'on'
+        }
+        tags = []
+        if name:
+            tags.append({'Key': 'Name', 'Value': name})
+
+        if tags:
+            launch_args['TagSpecifications'] = [
+                {'ResourceType': 'host', 'Tags': tags}
+            ]
+        response = self.ec2.allocate_hosts(**launch_args)
         self.host_id = response['HostIds'][0]
         return response
 

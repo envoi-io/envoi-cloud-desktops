@@ -39,6 +39,10 @@ class EnvoiDevelopmentMacOsCommand(CliCommand):
             'help': 'Host Availability Zone',
             'default': 'us-east-1a'
         },
+        "host-name": {
+            'help': 'Host Name',
+            'default': None
+        },
     }
 
     def run(self, opts=None):
