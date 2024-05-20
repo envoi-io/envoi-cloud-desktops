@@ -59,10 +59,10 @@ class DedicatedHost:
     def host_id(self, value):
         self._host_id = value
         if value:
-            self.host = self.describe()
+            self.details = self.describe()
 
     def instance_type(self):
-        return self.host['HostProperties']['InstanceType']
+        return self.details['HostProperties']['InstanceType']
 
     def describe(self):
         response = self.ec2.describe_hosts(HostIds=[self.host_id])
@@ -96,8 +96,15 @@ class Ec2Instance:
         self.ec2 = boto3.client('ec2')
         self.instance_id = kwargs.get('instance_id')
 
-        if self.instance_id:
-            self.instance = self.describe()
+    @property
+    def instance_id(self):
+        return self._instance_id
+
+    @instance_id.setter
+    def instance_id(self, value):
+        self._instance_id = value
+        if value:
+            self.details = self.describe()
 
     def describe(self):
         response = self.ec2.describe_instances(InstanceIds=[self.instance_id])
@@ -154,8 +161,8 @@ class Ec2Instance:
             {'ResourceType': 'instance', 'Tags': tags}
         ]
         response = self.ec2.run_instances(**run_instance_args)
-        self.instance = response['Instances'][0]
-        self.instance_id = self.instance['InstanceId']
+        self.details = response['Instances'][0]
+        self.instance_id = self.details['InstanceId']
 
         return response
 
@@ -169,7 +176,9 @@ class Ec2Instance:
         #         break
         #     time.sleep(15)
 
-    def connection_string(self):
-        public_dns_name = self.instance['PublicDnsName']
-        key_name = self.instance['KeyName']
-        return f"ssh -i {key_name} ec2-user@{public_dns_name}"
+    def connection_string(self, dns=True):
+        address_field_name = 'PublicDnsName' if dns else 'PublicIpAddress'
+        address = self.details[address_field_name]
+
+        key_name = self.details['KeyName']
+        return f"ssh -i {key_name}.pem ec2-user@{address}"
