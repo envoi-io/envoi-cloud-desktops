@@ -35,8 +35,6 @@ def envoi_dev_mac_os_command_handler(opts=None):
         launch_args = {
             'ami_id': ami_id,
             'host_id': dedicated_host.host_id,
-            'instance_type': instance_type,
-            'key_name': opts.key_pair_name,
             'instance_iam_role_id': opts.instance_iam_role_id,
             'instance_name': opts.instance_name,
             'instance_type': instance_type,
