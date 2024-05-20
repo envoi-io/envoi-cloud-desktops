@@ -9,7 +9,7 @@ In addition, EVD allows users to quickly launch and manage fleets of Mac OS, Lin
 
 ## Usage
 
-### Launch Linux workstations with HP Anyware
+### Linux workstations with HP Anyware
 
 ```text
 ./envoi-virtual-desktops hp-anyware centos-7 --help
@@ -39,7 +39,7 @@ options:
 
 ```
 
-### Launch Unreal Engine 5 Windows workstations with HP Anyware
+### Unreal Engine 5 Windows workstations with HP Anyware
 
 
 ```text
@@ -72,7 +72,7 @@ envoi-virtual-desktops hp-anyware unreal-engine-5 --stack-name STACK_NAME --inst
 ```
 
 
-### Launch Windows Server 2019 for Machine Learning and AI processing with HP Anyware
+### Windows Server 2019 for Machine Learning and AI processing with HP Anyware
 
 ```text
 
@@ -106,7 +106,7 @@ options:
 
 
 
-### Launch Linux workstations with Nice DCV
+### Linux workstations with Nice DCV
 
 ```text
 ./envoi-virtual-desktops nice-dcv centos-7 --help
@@ -136,7 +136,7 @@ options:
 
 ```
 
-### Launch Unreal Engine 5 Windows workstations with Nice DCV
+### Unreal Engine 5 Windows workstations with Nice DCV
 
 
 ```text
@@ -169,7 +169,7 @@ envoi-virtual-desktops nice-dcv unreal-engine-5 --stack-name STACK_NAME --instan
 ```
 
 
-### Launch Windows Server 2019 for Machine Learning and AI processing with Nice DCV
+### Windows Server 2019 for Machine Learning and AI processing with Nice DCV
 
 ```text
 
