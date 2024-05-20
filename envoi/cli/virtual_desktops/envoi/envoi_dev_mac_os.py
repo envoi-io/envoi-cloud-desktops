@@ -26,7 +26,7 @@ def envoi_dev_mac_os_command_handler(opts=None):
     dedicated_host = DedicatedHost(host_id=opts.host_id)
     if not dedicated_host.host_id:
         dedicated_host.launch(instance_type=opts.instance_type, availability_zone=opts.host_availability_zone,
-                              Name=opts.host_name)
+                              name=opts.host_name)
     instance_type = dedicated_host.instance_type()
     dedicated_host.wait()
 
@@ -173,9 +173,11 @@ class Ec2Instance:
         if user_data:
             run_instance_args['UserData'] = user_data
 
-        run_instance_args['TagSpecifications'] = [
-            {'ResourceType': 'instance', 'Tags': tags}
-        ]
+        if tags:
+            run_instance_args['TagSpecifications'] = [
+                {'ResourceType': 'instance', 'Tags': tags}
+            ]
+
         response = self.ec2.run_instances(**run_instance_args)
         self.details = response['Instances'][0]
         self.instance_id = self.details['InstanceId']
