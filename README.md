@@ -39,7 +39,7 @@ options:
 
 ```
 
-### Unreal Engine 5 Windows workstations with HP Anyware
+### Unreal Engine 5 Windows 2019 with HP Anyware
 
 
 ```text
@@ -72,7 +72,7 @@ envoi-virtual-desktops hp-anyware unreal-engine-5 --stack-name STACK_NAME --inst
 ```
 
 
-### Windows Server 2019 for Machine Learning and AI processing with HP Anyware
+### Windows Server 2019 for NVIDIA with HP Anyware
 
 ```text
 
@@ -136,7 +136,7 @@ options:
 
 ```
 
-### Unreal Engine 5 Windows workstations with Nice DCV
+### Unreal Engine 5 Windows Server 2019 with Nice DCV
 
 
 ```text
@@ -169,7 +169,7 @@ envoi-virtual-desktops nice-dcv unreal-engine-5 --stack-name STACK_NAME --instan
 ```
 
 
-### Windows Server 2019 for Machine Learning and AI processing with Nice DCV
+### Windows Server 2019 NVIDIA with Nice DCV
 
 ```text
 
