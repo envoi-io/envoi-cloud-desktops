@@ -44,7 +44,16 @@ def envoi_dev_mac_os_command_handler(opts=None):
         }
         instance.launch(**launch_args)
     instance.wait()
-    print("Connection command: ", instance.connection_string())
+    connection_string = instance.connection_string(dns=False)
+    response = f"""
+    Envoi Development MacOS instance launched successfully.
+    
+    To connect to the instance please use the following command:
+    
+        {connection_string}
+    
+    """
+    print(response)
 
 
 class DedicatedHost:
