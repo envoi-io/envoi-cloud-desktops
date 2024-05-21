@@ -1,7 +1,11 @@
 #!/bin/bash
 
+console_blue() {
+  echo -e "\033[0;34m$1\033[0m"
+}
+
 console() {
-  echo -e "\033[0;21m[ENVOI SETUP] $1\033[0m"
+  console_blue "[ENVOI SETUP] $1"
 }
 
 clone_repo() {
