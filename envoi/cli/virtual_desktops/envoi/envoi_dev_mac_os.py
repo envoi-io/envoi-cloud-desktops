@@ -188,8 +188,8 @@ class Ec2Instance:
             ]
 
         response = self.ec2.run_instances(**run_instance_args)
-        # self.details = response['Instances'][0]
-        self.instance_id = self.details['InstanceId']
+        instance_details = response['Instances'][0]
+        self.instance_id = instance_details['InstanceId']
 
         return response
 
