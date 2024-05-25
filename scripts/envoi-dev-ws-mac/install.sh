@@ -13,7 +13,7 @@ clone_repo() {
   # App name is the basename without the ext of the URL
   app_name=${2:-$(basename "$repo_url" .git)}
   console "Cloning $app_name..."
-  git clone $repo_url
+  git clone "$repo_url"
   console "Finished cloning $app_name."
 }
 
@@ -24,9 +24,9 @@ asdf_install_plugin() {
   source=${4}
 
   console "Installing $description"
-  asdf plugin add $plugin $source
-  asdf install $plugin $version
-  asdf global $plugin $version
+  asdf plugin add "$plugin" "$source"
+  asdf install "$plugin" "$version"
+  asdf global "$plugin" "$version"
   console "Finished installing $description"
 }
 
@@ -34,7 +34,7 @@ install_app() {
   command=$1
   app_name=${2:-$1}
   console "Installing $app_name..."
-  eval $command
+  eval "$command"
   console "Finished installing $app_name."
 }
 
@@ -94,6 +94,7 @@ else
   NONINTERACTIVE=1 /bin/bash -c \
      "$(curl -fsSL \
         https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+  # shellcheck disable=SC2016
   (echo; echo 'eval "$(/opt/homebrew/bin/brew shellenv)"') >> /Users/ec2-user/.zprofile
   eval "$(/opt/homebrew/bin/brew shellenv)"
   console "Finished installing Homebrew"
@@ -103,7 +104,8 @@ fi
 install_app "brew install asdf" "asdf"
 # Configure adsf to run on shell startup
 asdf_exec_path="$(brew --prefix asdf)/libexec/asdf.sh"
-echo -e "\n. ${asdf_exec_path}" >> ${ZDOTDIR:-~}/.zshrc
+echo -e "\n. ${asdf_exec_path}" >> "${ZDOTDIR:-~}/.zshrc"
+# shellcheck disable=SC1090
 . "${asdf_exec_path}"
 
 # Programming Languages - These need to be installed before other applications (except Homebrew and asdf)
@@ -128,12 +130,13 @@ install_app "brew install cassandra" "Cassandra"
 install_app "brew install carthage" "Carthage"
 install_app "brew install cocoapods" "Cocoapods"
 install_app "brew tap jakehilborn/jakehilborn && brew install displayplacer" "Displayplacer"
-install_app "brew tap weaveworks/tap && brew install weaveworks/tap/eksctl" "EKSCTL"
+install_app "brew tap weaveworks/tap && brew install weaveworks/tap/eksctl" "eksctl"
 install_app "brew tap elastic/tap && brew install elastic/tap/elasticsearch-full" "Elasticsearch"
 install_app "brew install exiftool" "ExifTool"
 install_app "brew install ffmpeg" "FFMPEG"
 asdf_install_plugin gcloud latest "Google Cloud SDK" "https://github.com/jthegedus/asdf-gcloud"
 install_app "brew install gradle" "Gradle"
+install_app "brew install gum" "Gum"
 install_app "brew install htop" "htop"
 install_app "brew install jq" "jq"
 install_app "brew install kops" "Kops"
@@ -185,6 +188,7 @@ install_app "brew install --cask xcodes" "Xcodes"
 install_app "brew install --cask zed"
 
 
+# File Downloads
 download_file "Aspera Desktop Client" "https://ak-delivery04-mul.dhe.ibm.com/sar/CMA/OSA/0c4zi/0/IBMAsperaDesktopClient-4.4.4.1293-mac-11.0-armv8-release.dmg"
 #download_file "AWS Deadline Cloud Monitor" "https://d2ev1rdnjzhmnr.cloudfront.net/Deadline%20Cloud%20Monitor%201.1.1%20aarch64.dmg"
 download_file "Tizen Studio" "https://download.tizen.org/sdk/Installer/tizen-studio_5.6/web-ide_Tizen_Studio_5.6_macos-64.dmg"
