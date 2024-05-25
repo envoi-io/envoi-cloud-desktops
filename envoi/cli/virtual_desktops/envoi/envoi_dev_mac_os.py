@@ -1,7 +1,6 @@
-import os
-
 import boto3
 import time
+
 
 def envoi_dev_mac_os_command_handler(opts=None):
     ami_id = opts.ami_id or 'ami-0cc2f298aa1a495a1'  # ami-038e1d574f3140013
@@ -207,12 +206,6 @@ class Ec2Instance:
     def wait(self):
         waiter = self.ec2.get_waiter('instance_running')
         waiter.wait(InstanceIds=[self.instance_id])
-        # while True:
-        #     response = self.ec2.describe_instances(InstanceIds=[self.instance_id])
-        #     state = response['Reservations'][0]['Instances'][0]['State']['Name']
-        #     if state == 'running':
-        #         break
-        #     time.sleep(15)
 
     def connection_string(self, dns=True):
         address_field_name = 'PublicDnsName' if dns else 'PublicIpAddress'
