@@ -1,28 +1,20 @@
+import os
+
 import boto3
 import time
 
-
-def determine_latest_macos_ami():
-    ec2 = boto3.client('ec2')
-    response = ec2.describe_images(
-        Filters=[
-            {
-                'Name': 'name',
-                'Values': ['envoi-dev-mac-*']
-            },
-            {
-                'Name': 'state',
-                'Values': ['available']
-            }
-        ]
-    )
-    images = response['Images']
-    images.sort(key=lambda x: x['CreationDate'], reverse=True)
-    return images[0]
-
-
 def envoi_dev_mac_os_command_handler(opts=None):
-    ami_id = opts.ami_id or 'ami-031445a67a8e9b092'
+    ami_id = opts.ami_id or 'ami-0cc2f298aa1a495a1'  # ami-038e1d574f3140013
+
+    if opts.security_group_id:
+        security_group_ids = opts.security_group_id
+    else:
+        if opts.no_default_security_group:
+            security_group_ids = []
+        else:
+            security_group_ids = create_default_security_group(opts.default_security_group_inbound_cidr,
+                                                               opts.default_security_group_protocols)
+
     dedicated_host = DedicatedHost(host_id=opts.host_id)
     if not dedicated_host.host_id:
         dedicated_host.launch(instance_type=opts.instance_type, availability_zone=opts.host_availability_zone,
@@ -34,12 +26,14 @@ def envoi_dev_mac_os_command_handler(opts=None):
     if not instance.instance_id:
         launch_args = {
             'ami_id': ami_id,
+            'elastic_network_interface_ids': opts.instance_eni_id,
             'host_id': dedicated_host.host_id,
+            'instance_eni_ids': opts.instance_eni_id,
             'instance_iam_role_id': opts.instance_iam_role_id,
             'instance_name': opts.instance_name,
             'instance_type': instance_type,
             'key_name': opts.key_pair_name,
-            'security_group_ids': opts.security_group_id,
+            'security_group_ids': security_group_ids,
             'subnet_id': opts.subnet_id
         }
         instance.launch(**launch_args)
@@ -133,6 +127,7 @@ class Ec2Instance:
 
     def launch(self,
                ami_id=None,
+               elastic_network_interface_ids=None,
                host_id=None,
                instance_name=None,
                instance_iam_role_id=None,
@@ -144,6 +139,7 @@ class Ec2Instance:
                user_data=None,
                ):
         tags = tags or []
+        elastic_network_interface_ids = elastic_network_interface_ids or []
         security_group_ids = security_group_ids or []
 
         run_instance_args = {
@@ -152,6 +148,14 @@ class Ec2Instance:
             'MaxCount': 1,
             'MinCount': 1
         }
+
+        if elastic_network_interface_ids:
+            if isinstance(elastic_network_interface_ids, str):
+                elastic_network_interface_ids = elastic_network_interface_ids.split(',')
+
+            for eni_id in elastic_network_interface_ids:
+                run_instance_args['NetworkInterfaces'] = [{'NetworkInterfaceId': eni_id}]
+
         if host_id:
             run_instance_args['Placement'] = {'HostId': host_id}
 
@@ -209,3 +213,81 @@ class Ec2Instance:
 
         key_name = self.details['KeyName']
         return f"ssh -i {key_name}.pem ec2-user@{address}"
+
+
+def create_default_security_group(name='envoi-dev-macos', vpc_id=None, inbound_ip_ranges=None, protocols=None):
+    """
+    Create a default security group for a macOS instance
+    :param inbound_ip_ranges:
+    :param vpc_id:
+    :param name:
+    :param protocols:
+    :return:
+    """
+    ec2 = boto3.client('ec2')
+    create_security_group_args = {
+        'Description': 'Default Security Group',
+        'GroupName': name
+    }
+    if vpc_id:
+        create_security_group_args['VpcId'] = vpc_id
+
+    if inbound_ip_ranges is None:
+        inbound_ip_ranges = [{'CidrIp': '0.0.0.0/0'}]
+
+    ip_permissions = []
+
+    if protocols is None:
+        protocols = ['ssh']
+    else:
+        if isinstance(protocols, str):
+            protocols = protocols.split(',')
+    for protocol in protocols:
+        if protocol == 'ssh':
+            ip_permissions.append({
+                'IpProtocol': 'tcp',
+                'FromPort': 22,
+                'ToPort': 22,
+                'IpRanges': inbound_ip_ranges,
+                'Description': 'SSH'
+            })
+        elif protocol == 'vnc':
+            ip_permissions.append({
+                'IpProtocol': 'tcp',
+                'FromPort': 5900,
+                'ToPort': 5900,
+                'IpRanges': inbound_ip_ranges,
+                'Description': 'VNC Port'
+            })
+        elif protocol == 'ard':
+            ip_permissions.append({
+                'IpProtocol': 'tcp',
+                'FromPort': 3283,
+                'ToPort': 3283,
+                'IpRanges': inbound_ip_ranges,
+                'Description': 'Apple Remote Desktop'
+            })
+
+    response = ec2.create_security_group(**create_security_group_args)
+    security_group_id = response['GroupId']
+    ec2.authorize_security_group_ingress(GroupId=security_group_id, IpPermissions=ip_permissions)
+    return security_group_id
+
+
+def determine_latest_macos_ami():
+    ec2 = boto3.client('ec2')
+    response = ec2.describe_images(
+        Filters=[
+            {
+                'Name': 'name',
+                'Values': ['envoi-dev-mac-*']
+            },
+            {
+                'Name': 'state',
+                'Values': ['available']
+            }
+        ]
+    )
+    images = response['Images']
+    images.sort(key=lambda x: x['CreationDate'], reverse=True)
+    return images[0]

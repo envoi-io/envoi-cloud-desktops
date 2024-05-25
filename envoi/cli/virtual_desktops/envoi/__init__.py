@@ -15,7 +15,7 @@ class EnvoiDevelopmentLinuxCommand(LaunchUsingCloudFormationCliCommand):
 
 
 class EnvoiDevelopmentMacOsCommand(CliCommand):
-    DESCRIPTION = "Envoi Development MacOS Command"
+    DESCRIPTION = "Envoi Development macOS Command"
     PARAMS = {
         **COMMON_PARAMS,
         **COMMON_EC2_LAUNCH_PARAMS,
@@ -26,6 +26,10 @@ class EnvoiDevelopmentMacOsCommand(CliCommand):
         "instance-name": {
             'help': 'Instance Name',
             'default': 'envoi-dev-macos'
+        },
+        "instance-eni-id": {
+            "help": "Instance Elastic Network Interface ID. This can be used to attach an existing ENI to the instance.",
+            "default": None
         },
         "instance-type": {
             'help': 'Instance Type',
@@ -42,6 +46,20 @@ class EnvoiDevelopmentMacOsCommand(CliCommand):
         "host-name": {
             'help': 'Host Name',
             'default': None
+        },
+        "no-default-security-group": {
+            'help': 'If provided then a security group will not be created by default.'
+                    'This only applies when no security group id is provided',
+            'default': False,
+        },
+        "default-security-group-inbound-cidr": {
+            'help': 'Sets the default security group inbound CIDR',
+            'default': '0.0.0.0/0'
+        },
+        "default-security-group-protocols": {
+            'help': 'Default Security Group Protocols. Comma separated list of protocols.'
+                    'Can be any combination of ssh,vnc,ard.',
+            'default': 'ssh'
         },
     }
 

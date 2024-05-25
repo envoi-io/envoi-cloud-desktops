@@ -19,7 +19,6 @@ run_install() {
 sudo launchctl enable system/com.apple.screensharing
 sudo launchctl load -w /System/Library/LaunchDaemons/com.apple.screensharing.plist
 
-install_app "brew tap jakehilborn/jakehilborn && brew install displayplacer" "Displayplacer"
 get_instance_metadata() {
   path_part=$1
   TOKEN=`curl -s -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600"` \
@@ -44,4 +43,13 @@ console_blue <<EOF
 
   ssh $(whoami)@$(get_public_ip) -L 5900:localhost:5900 -i <keyname>
 EOF
+
+#instance_id=$(get_instance_id)
+
+# If NONINTERACTIVE is not set then prompt for ec2-user password
+#default_password="envoi-${instance_id}"
+
+if [ -z "$NONINTERACTIVE" ]; then
+  echo
+fi
 
