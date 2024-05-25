@@ -40,12 +40,19 @@ def envoi_dev_mac_os_command_handler(opts=None):
     instance.wait()
     connection_string = instance.connection_string(dns=False)
     response = f"""
-    Envoi Development MacOS instance launched successfully.
+Envoi Development macOS Instance Launched Successfully
+    Host ID: {dedicated_host.host_id}
+    Instance ID: {instance.instance_id}
     
-    To connect to the instance please use the following command:
+To connect to the instance please use the following command:
+
+    {connection_string}
+
+* It may take several minutes before the instance allows connections
+
+Once connected you can run the following command to setup the instance:
     
-        {connection_string}
-    
+    /bin/bash -c "$(curl -fsSL  https://raw.githubusercontent.com/envoi-io/envoi-cloud-desktops/main/scripts/envoi-dev-ws-mac/setup.sh)"    
     """
     print(response)
 
