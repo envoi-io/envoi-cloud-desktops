@@ -189,17 +189,20 @@ download_file "Aspera Desktop Client" "https://ak-delivery04-mul.dhe.ibm.com/sar
 #download_file "AWS Deadline Cloud Monitor" "https://d2ev1rdnjzhmnr.cloudfront.net/Deadline%20Cloud%20Monitor%201.1.1%20aarch64.dmg"
 download_file "Tizen Studio" "https://download.tizen.org/sdk/Installer/tizen-studio_5.6/web-ide_Tizen_Studio_5.6_macos-64.dmg"
 
-export ENVOI_APP_TARGET_DIR="/opt/envoi"
-sudo mkdir -p "${ENVOI_APP_TARGET_DIR}"
-sudo chown ec2-user:staff "${ENVOI_APP_TARGET_DIR}"
-cd "${ENVOI_APP_TARGET_DIR}"
-
 # Envoi Applications
-clone_repo "https://github.com/envoi-io/envoi-transfer-service.git" "Envoi Transfer Service"
-clone_repo "https://github.com/envoi-io/envoi-cloud-storage.git" "Envoi Cloud Storage CLI"
-clone_repo "https://github.com/envoi-io/envoi-cloud-desktops.git" "Envoi Cloud Desktops CLI"
-clone_repo "https://github.com/envoi-io/envoi-cloud-transcode.git" "Envoi Cloud Transcode CLI"
-clone_repo "https://github.com/envoi-io/envoi-mig.git" "Envoi MIG CLI"
-install_app "cd ${ENVOI_APP_TARGET_DIR}/envoi-mig && bundle install" "Envoi MIG CLI"
+install_envoi_apps() {
+  export ENVOI_APP_TARGET_DIR="/opt/envoi"
+  sudo mkdir -p "${ENVOI_APP_TARGET_DIR}"
+  sudo chown ec2-user:staff "${ENVOI_APP_TARGET_DIR}"
+  cd "${ENVOI_APP_TARGET_DIR}" || return
 
-clone_repo "https://github.com/envoi-io/envoi-s3-client.git" "Envoi S3 Client CLI"
+  clone_repo "https://github.com/envoi-io/envoi-transfer-service.git" "Envoi Transfer Service"
+  clone_repo "https://github.com/envoi-io/envoi-cloud-storage.git" "Envoi Cloud Storage CLI"
+  clone_repo "https://github.com/envoi-io/envoi-cloud-desktops.git" "Envoi Cloud Desktops CLI"
+  clone_repo "https://github.com/envoi-io/envoi-cloud-transcode.git" "Envoi Cloud Transcode CLI"
+  clone_repo "https://github.com/envoi-io/envoi-mig.git" "Envoi MIG CLI"
+  install_app "cd ${ENVOI_APP_TARGET_DIR}/envoi-mig && bundle install" "Envoi MIG CLI"
+
+  clone_repo "https://github.com/envoi-io/envoi-s3-client.git" "Envoi S3 Client CLI"
+}
+install_envoi_apps
