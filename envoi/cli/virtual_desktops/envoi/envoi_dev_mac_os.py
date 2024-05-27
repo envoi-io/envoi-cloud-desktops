@@ -2,8 +2,26 @@ import boto3
 import time
 
 
+def get_default_vpc_id():
+    ec2 = boto3.client('ec2')
+    response = ec2.describe_vpcs(
+        Filters=[{'Name': 'isDefault', 'Values': ['true']}]
+    )
+    return response['Vpcs'][0]['VpcId']
+
+
 def envoi_dev_mac_os_command_handler(opts=None):
     ami_id = opts.ami_id or 'ami-0cc2f298aa1a495a1'  # ami-038e1d574f3140013
+
+    vpc_id = opts.vpc_id
+    subnet_id = opts.subnet_id
+    if not vpc_id:
+        if subnet_id:
+            ec2 = boto3.client('ec2')
+            response = ec2.describe_subnets(SubnetIds=[subnet_id])
+            vpc_id = response['Subnets'][0]['VpcId']
+        else:
+            vpc_id = get_default_vpc_id()
 
     if opts.security_group_id:
         security_group_ids = opts.security_group_id
@@ -11,8 +29,14 @@ def envoi_dev_mac_os_command_handler(opts=None):
         if opts.no_default_security_group:
             security_group_ids = []
         else:
-            security_group_ids = create_default_security_group(opts.default_security_group_inbound_cidr,
-                                                               opts.default_security_group_protocols)
+
+            inbound_ip_ranges = [{'CidrIp': opts.default_security_group_inbound_cidr}]
+            security_group_ids = create_default_security_group(
+                name=opts.default_security_group_name,
+                vpc_id=vpc_id,
+                inbound_ip_ranges=inbound_ip_ranges,
+                protocols=opts.default_security_group_protocols,
+                allow_overwrite=opts.default_security_group_allow_overwrite)
 
     dedicated_host = DedicatedHost(host_id=opts.host_id)
     if not dedicated_host.host_id:
@@ -215,22 +239,31 @@ class Ec2Instance:
         return f"ssh -i {key_name}.pem ec2-user@{address}"
 
 
-def create_default_security_group(name='envoi-dev-macos', vpc_id=None, inbound_ip_ranges=None, protocols=None):
+def create_default_security_group(name='envoi-dev-macos', vpc_id=None, inbound_ip_ranges=None, protocols=None, allow_overwrite=False):
     """
     Create a default security group for a macOS instance
     :param inbound_ip_ranges:
     :param vpc_id:
     :param name:
     :param protocols:
+    :param allow_overwrite:
     :return:
     """
     ec2 = boto3.client('ec2')
     create_security_group_args = {
-        'Description': 'Default Security Group',
+        'Description': 'Default Security Group for Envoi Development macOS Instances',
         'GroupName': name
     }
     if vpc_id:
         create_security_group_args['VpcId'] = vpc_id
+
+    if allow_overwrite:
+        response = ec2.describe_security_groups(Filters=[
+            {'Name': 'vpc-id', 'Values': [vpc_id]},
+            {'Name': 'group-name', 'Values': [name]}])
+        if response['SecurityGroups']:
+            security_group_id = response['SecurityGroups'][0]['GroupId']
+            ec2.delete_security_group(GroupId=security_group_id)
 
     if inbound_ip_ranges is None:
         inbound_ip_ranges = [{'CidrIp': '0.0.0.0/0'}]
@@ -248,24 +281,21 @@ def create_default_security_group(name='envoi-dev-macos', vpc_id=None, inbound_i
                 'IpProtocol': 'tcp',
                 'FromPort': 22,
                 'ToPort': 22,
-                'IpRanges': inbound_ip_ranges,
-                'Description': 'SSH'
+                'IpRanges': inbound_ip_ranges
             })
         elif protocol == 'vnc':
             ip_permissions.append({
                 'IpProtocol': 'tcp',
                 'FromPort': 5900,
                 'ToPort': 5900,
-                'IpRanges': inbound_ip_ranges,
-                'Description': 'VNC Port'
+                'IpRanges': inbound_ip_ranges
             })
         elif protocol == 'ard':
             ip_permissions.append({
                 'IpProtocol': 'tcp',
                 'FromPort': 3283,
                 'ToPort': 3283,
-                'IpRanges': inbound_ip_ranges,
-                'Description': 'Apple Remote Desktop'
+                'IpRanges': inbound_ip_ranges
             })
 
     response = ec2.create_security_group(**create_security_group_args)

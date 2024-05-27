@@ -49,17 +49,32 @@ class EnvoiDevelopmentMacOsCommand(CliCommand):
         },
         "no-default-security-group": {
             'help': 'If provided then a security group will not be created by default.'
-                    'This only applies when no security group id is provided',
+                    ' This only applies when no security group id is provided',
             'default': False,
         },
         "default-security-group-inbound-cidr": {
-            'help': 'Sets the default security group inbound CIDR',
+            'help': 'Sets the default security group inbound CIDR.'
+                    ' This is only used when no security group id is provided.',
             'default': '0.0.0.0/0'
+        },
+        "default-security-group-name": {
+            'help': 'Default Security Group Name. This is only used when no security group id is provided.',
+            'default': 'envoi-dev-macos'
         },
         "default-security-group-protocols": {
             'help': 'Default Security Group Protocols. Comma separated list of protocols.'
-                    'Can be any combination of ssh,vnc,ard.',
+                    ' Can be any combination of ssh,vnc,ard.'
+                    ' This is only used when no security group id is provided.',
             'default': 'ssh'
+        },
+        "default-security-group-allow-overwrite": {
+            'help': 'If provided then the default security group will be overwritten.'
+                    ' This is only used when no security group id is provided.',
+            'default': False
+        },
+        "vpc-id": {
+            'help': 'VPC ID',
+            'default': None
         },
     }
 
