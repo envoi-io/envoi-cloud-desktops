@@ -51,7 +51,6 @@ def envoi_dev_mac_os_command_handler(opts=None):
             'ami_id': ami_id,
             'elastic_network_interface_ids': opts.instance_eni_id,
             'host_id': dedicated_host.host_id,
-            'instance_eni_ids': opts.instance_eni_id,
             'instance_iam_role_id': opts.instance_iam_role_id,
             'instance_name': opts.instance_name,
             'instance_type': instance_type,
