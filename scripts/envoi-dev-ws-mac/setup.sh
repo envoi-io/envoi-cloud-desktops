@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 console_blue() {
   echo -e "\033[0;34m$1\033[0m"
@@ -37,6 +37,7 @@ get_public_ipv6() {
   get_instance_metadata public-ipv6
 }
 
+run_install
 console_blue <<EOF
   To connect to the remote desktop, you need to run the following command:
 
