@@ -40,7 +40,8 @@ get_public_ipv6() {
 console_blue <<EOF
   To connect to the remote desktop, you need to run the following command:
 
-  ssh $(whoami)@$(get_public_ip) -L 5900:localhost:5900 -i <keyname>
+  IPV4: ssh $(whoami)@$(get_public_ipv4) -L 5900:localhost:5900 -i <keyname>
+  IPV6: ssh $(whoami)@$(get_public_ipv6) -L 5900:localhost:5900 -i <keyname>
 EOF
 
 #instance_id=$(get_instance_id)
