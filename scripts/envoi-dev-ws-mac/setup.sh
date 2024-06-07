@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 
+# Redirect stdout to a log file and display it on the console
+exec > >(tee /tmp/envoi-setup.log) 2>&1
+
 console_blue() {
   echo -e "\033[0;34m$1\033[0m"
 }
@@ -16,8 +19,12 @@ run_install() {
 # Configure the system to allow remote desktop connections
 ############################################################################################
 
-sudo launchctl enable system/com.apple.screensharing
-sudo launchctl load -w /System/Library/LaunchDaemons/com.apple.screensharing.plist
+enable_remote_desktop() {
+  console "Configuring the system to allow remote desktop connections"
+  sudo launchctl enable system/com.apple.screensharing
+  sudo launchctl load -w /System/Library/LaunchDaemons/com.apple.screensharing.plist
+  console "Finished configuring the system to allow remote desktop connections"
+}
 
 get_instance_metadata() {
   path_part=$1
@@ -37,6 +44,7 @@ get_public_ipv6() {
   get_instance_metadata public-ipv6
 }
 
+enable_remote_desktop
 run_install
 console_blue <<EOF
   To connect to the remote desktop, you need to run the following command:

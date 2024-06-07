@@ -1,5 +1,7 @@
 #!/bin/bash
 
+exec > >(tee /tmp/envoi-install.log) 2>&1
+
 console_blue() {
   echo -e "\033[0;34m$1\033[0m"
 }
