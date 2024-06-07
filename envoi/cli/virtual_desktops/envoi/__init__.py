@@ -72,6 +72,10 @@ class EnvoiDevelopmentMacOsCommand(CliCommand):
                     ' This is only used when no security group id is provided.',
             'default': False
         },
+        "volume-size": {
+            'help': 'Volume Size',
+            'default': None
+        },
         "vpc-id": {
             'help': 'VPC ID',
             'default': None

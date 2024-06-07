@@ -56,7 +56,8 @@ def envoi_dev_mac_os_command_handler(opts=None):
             'instance_type': instance_type,
             'key_name': opts.key_pair_name,
             'security_group_ids': security_group_ids,
-            'subnet_id': opts.subnet_id
+            'subnet_id': opts.subnet_id,
+            'volume_size': opts.volume_size
         }
         instance.launch(**launch_args)
     instance.wait()
@@ -166,6 +167,7 @@ class Ec2Instance:
                subnet_id=None,
                tags=None,
                user_data=None,
+               volume_size=None
                ):
         tags = tags or []
         elastic_network_interface_ids = elastic_network_interface_ids or []
@@ -175,7 +177,8 @@ class Ec2Instance:
             'ImageId': ami_id,
             'InstanceType': instance_type,
             'MaxCount': 1,
-            'MinCount': 1
+            'MinCount': 1,
+
         }
 
         if elastic_network_interface_ids:
@@ -218,6 +221,17 @@ class Ec2Instance:
         if tags:
             run_instance_args['TagSpecifications'] = [
                 {'ResourceType': 'instance', 'Tags': tags}
+            ]
+
+        if volume_size:
+            run_instance_args['BlockDeviceMappings'] = [
+                {
+                    'DeviceName': '/dev/sda1',
+                    'Ebs': {
+                        'VolumeSize': volume_size,
+                        'VolumeType': 'gp2'
+                    }
+                }
             ]
 
         response = self.ec2.run_instances(**run_instance_args)
