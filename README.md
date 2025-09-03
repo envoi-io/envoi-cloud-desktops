@@ -1,6 +1,6 @@
-# Envoi Virtual Desktops
+# Envoi Cloud Desktops
 
-Envoi Virtual Desktops (EVD) is a desktop and server virtualization service designed for content creators looking to run video editing, graphics, visual effects, and machine learning workloads on both Amazon Web Services (AWS) and Google Cloud Platform (GCP)
+Envoi Cloud Desktops (ECD) is a desktop and server virtualization service designed for content creators looking to run video editing, graphics, visual effects, and machine learning workloads on both Amazon Web Services (AWS) and Google Cloud Platform (GCP)
 
 EVD is a part of Envoi's cloud platform that automates creating, managing, and distributing 24x7, live free ad-supported streaming television "FAST", Subscription or Pay-Per-View OTT (internet delivered) channels.
 
@@ -49,7 +49,7 @@ options:
 
 ```
 
-### Linux Development Workstations
+### Davince Resolve Linux Development Workstations
 
 ```text
 ./envoi-virtual-desktops envoi development-linux --help
@@ -121,7 +121,7 @@ envoi-virtual-desktops hp-anyware unreal-engine-5 --stack-name STACK_NAME --inst
 ```
 
 
-### Windows Server 2019 for NVIDIA with HP Anyware
+### ### Davince Resolve Windows Server 2025 for NVIDIA with HP Anyware
 
 ```text
 
@@ -185,7 +185,7 @@ options:
 
 ```
 
-### Unreal Engine 5 Windows Server 2019 with Nice DCV
+### Unreal Engine 5 Windows Server 2025 with Nice DCV
 
 
 ```text
@@ -218,7 +218,7 @@ envoi-virtual-desktops nice-dcv unreal-engine-5 --stack-name STACK_NAME --instan
 ```
 
 
-### Windows Server 2019 NVIDIA with Nice DCV
+### Windows Server 2025 NVIDIA with Nice DCV
 
 ```text
 
