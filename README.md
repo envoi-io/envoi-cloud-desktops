@@ -1,252 +1,215 @@
-# Envoi Cloud Desktops
+### Envoi Cloud Desktops (ECD)
 
-Envoi Cloud Desktops (ECD) is a desktop and server virtualization service designed for content creators looking to run video editing, graphics, visual effects, and machine learning workloads on both Amazon Web Services (AWS) and Google Cloud Platform (GCP)
+Envoi Cloud Desktops (ECD) is a desktop and server virtualization service designed for content creators to run video editing, graphics, visual effects, and machine learning workloads on both **Amazon Web Services (AWS)** and **Google Cloud Platform (GCP)**.
 
-EVD is a part of Envoi's cloud platform that automates creating, managing, and distributing 24x7, live free ad-supported streaming television "FAST", Subscription or Pay-Per-View OTT (internet delivered) channels.
+ECD is a part of Envoi's cloud platform that automates creating, managing, and distributing 24x7, live free ad-supported streaming television ("FAST"), Subscription or Pay-Per-View OTT (internet delivered) channels.
 
-In addition, EVD allows users to quickly launch and manage fleets of Mac OS, Linux, and Windows virtual desktop infrastructures and automates storage provisioning for the AWS FSx, Qumulo and Weka high performance filesystems. 
+In addition, ECD allows users to quickly launch and manage fleets of macOS, Linux, and Windows virtual desktop infrastructures and automates storage provisioning for the AWS FSx, Qumulo, and Weka high-performance filesystems.
 
+-----
 
-## Usage
+### Usage
 
-### Mac OS M2 Pro Development Workstations
+### macOS M2 Pro Development Workstations
 
-```text
-./envoi-virtual-desktops envoi development-macos --help
-usage: envoi-virtual-desktops envoi development-macos [-h] [--ami-id AMI_ID] [--instance-name INSTANCE_NAME]
-                                                      [--instance-iam-role-id INSTANCE_IAM_ROLE_ID] [--instance-type INSTANCE_TYPE]
-                                                      [--key-pair-name KEY_PAIR_NAME] [--security-group-id SECURITY_GROUP_ID]
-                                                      [--subnet-id SUBNET_ID] [--instance-id INSTANCE_ID] [--host-id HOST_ID]
-                                                      [--host-availability-zone HOST_AVAILABILITY_ZONE] [--host-name HOST_NAME]
+This command provisions an **Apple Mac instance** on AWS, which is essential for developing, building, and running applications on the macOS platform in the cloud. It leverages a dedicated host to provide the underlying hardware.
 
-options:
-  -h, --help            show this help message and exit
-  --ami-id AMI_ID       AMI ID (default: None)
-  --instance-name INSTANCE_NAME
-                        Instance Name (default: envoi-dev-macos)
-  --instance-iam-role-id INSTANCE_IAM_ROLE_ID
-                        Instance IAM Role Name or ARN (default: None)
-  --instance-type INSTANCE_TYPE
-                        Instance Type (default: mac2-m2pro.metal)
-  --key-pair-name KEY_PAIR_NAME
-                        Key Pair Name (default: None)
-  --security-group-id SECURITY_GROUP_ID
-                        Comma separated list of Security Group IDs (default: None)
-  --subnet-id SUBNET_ID
-                        Subnet ID (default: None)
-  --instance-id INSTANCE_ID
-                        Instance ID (default: None)
-  --host-id HOST_ID     Host ID (default: None)
-  --host-availability-zone HOST_AVAILABILITY_ZONE
-                        Host Availability Zone (default: us-east-1a)
-  --host-name HOST_NAME
-                        Host Name (default: None)
+#### **Command-Line Arguments**
 
+  * `--ami-id AMI_ID`: The unique ID of the Amazon Machine Image (AMI) to use for the instance.
+  * `--instance-name INSTANCE_NAME`: A user-defined, human-readable name for the new EC2 instance. The default is `envoi-dev-macos`.
+  * `--instance-iam-role-id INSTANCE_IAM_ROLE_ID`: The **IAM Role Name or ARN** to associate with the instance.
+  * `--instance-type INSTANCE_TYPE`: Specifies the size and hardware configuration. The default is `mac2-m2pro.metal`.
+  * `--key-pair-name KEY_PAIR_NAME`: The name of an existing EC2 Key Pair for SSH access.
+  * `--security-group-id SECURITY_GROUP_ID`: A comma-separated list of **Security Group IDs** to attach to the instance.
+  * `--subnet-id SUBNET_ID`: The unique ID of the subnet where the instance will be launched.
+  * `--instance-id INSTANCE_ID`: The ID of an existing instance for operations like stopping or starting. **Not used for creation.**
+  * `--host-id HOST_ID`: The ID of a dedicated host to launch the instance on. This is required for macOS EC2 instances.
+  * `--host-availability-zone HOST_AVAILABILITY_ZONE`: The Availability Zone of the dedicated host. The default is `us-east-1a`.
+  * `--host-name HOST_NAME`: A name for the dedicated host.
+
+#### **Example Command**
+
+```bash
+./envoi-virtual-desktops envoi development-macos \
+  --ami-id ami-0abcdef1234567890 \
+  --instance-name my-macos-dev-desktop \
+  --key-pair-name my-ssh-key \
+  --security-group-id sg-0123456789abcdef0 \
+  --instance-iam-role-id my-iam-role
 ```
 
-```shell
-./envoi-virtual-desktops envoi development-macos --ami-id AMI_ID --instance-name INSTANCE_NAME --key-pair-name KEY_PAIR_NAME --security-group-id SECURITY_GROUP_ID --instance-iam-role INSTANCE_IAM_ROLE_ID
+-----
 
+### DaVinci Resolve Linux Development Workstations
+
+This command launches a Linux-based virtual desktop optimized for **DaVinci Resolve**, a professional video editing application. It uses a **CloudFormation stack** for streamlined deployment.
+
+#### **Command-Line Arguments**
+
+  * `--stack-name STACK_NAME`: **(Required)** The unique name for the CloudFormation stack.
+  * `--ami-id AMI_ID`: The AMI ID to be used, which should be a pre-baked Linux image with DaVinci Resolve and NVIDIA drivers.
+  * `--instance-name INSTANCE_NAME`: A name for the virtual desktop instance.
+  * `--instance-iam-role-id INSTANCE_IAM_ROLE_ID`: The IAM role for the instance.
+  * `--instance-type INSTANCE_TYPE`: The EC2 instance type, typically a GPU-enabled instance like a `g4dn.xlarge`.
+  * `--key-pair-name KEY_PAIR_NAME`: The SSH Key Pair for secure access.
+  * `--security-group-id SECURITY_GROUP_ID`: The security groups to apply.
+  * `--subnet-id SUBNET_ID`: The subnet where the instance will be deployed.
+
+#### **Example Command**
+
+```bash
+./envoi-virtual-desktops envoi development-linux \
+  --stack-name resolve-linux-desktop \
+  --ami-id ami-0abcdef1234567890 \
+  --instance-name resolve-workstation-1 \
+  --instance-type g4dn.xlarge \
+  --key-pair-name my-linux-ssh-key \
+  --security-group-id sg-0123456789abcdef0 \
+  --subnet-id subnet-0123456789abcdef0
 ```
 
-### Davince Resolve Linux Development Workstations
-
-```text
-./envoi-virtual-desktops envoi development-linux --help
-usage: envoi-virtual-desktops envoi development-linux [-h] --stack-name STACK_NAME [--ami-id AMI_ID] [--instance-name INSTANCE_NAME]
-                                                      [--instance-iam-role-id INSTANCE_IAM_ROLE_ID] [--instance-type INSTANCE_TYPE]
-                                                      [--key-pair-name KEY_PAIR_NAME] [--security-group-id SECURITY_GROUP_ID]
-                                                      [--subnet-id SUBNET_ID]
-
-options:
-  -h, --help            show this help message and exit
-  --stack-name STACK_NAME
-                        Name of the CloudFormation stack (default: None)
-  --ami-id AMI_ID       AMI ID (default: None)
-  --instance-name INSTANCE_NAME
-                        Instance Name (default: None)
-  --instance-iam-role-id INSTANCE_IAM_ROLE_ID
-                        Instance IAM Role Name or ARN (default: None)
-  --instance-type INSTANCE_TYPE
-                        Instance Type (default: None)
-  --key-pair-name KEY_PAIR_NAME
-                        Key Pair Name (default: None)
-  --security-group-id SECURITY_GROUP_ID
-                        Comma separated list of Security Group IDs (default: None)
-  --subnet-id SUBNET_ID
-                        Subnet ID (default: None)
-
-
-```
-
-```shell
-./envoi-virtual-desktops hp-anyware centos-7 --stack-name STACK_NAME --instance-type-size INSTANCE_TYPE_SIZE --vpc-cidr VPC_CIDR --subnet-cidr SUBNET_CIDR --allow-admin-cidr ALLOW_ADMIN_CIDR --allow-client-cidr ALLOW_CLIENT_CIDR --template-url TEMPLATE_URL
-
-```
+-----
 
 ### Windows Server Development Workstations
 
+This command deploys a **Windows-based virtual desktop** using the same CloudFormation stack-based deployment as the Linux desktops.
 
-```text
+#### **Command-Line Arguments**
 
-./envoi-virtual-desktops envoi development-windows --help
-usage: envoi-virtual-desktops envoi development-windows [-h] --stack-name STACK_NAME [--ami-id AMI_ID] [--instance-name INSTANCE_NAME]
-                                                        [--instance-iam-role-id INSTANCE_IAM_ROLE_ID] [--instance-type INSTANCE_TYPE]
-                                                        [--key-pair-name KEY_PAIR_NAME] [--security-group-id SECURITY_GROUP_ID]
-                                                        [--subnet-id SUBNET_ID]
+  * `--stack-name STACK_NAME`: **(Required)** The name for the CloudFormation stack.
+  * `--ami-id AMI_ID`: The AMI ID for the Windows Server.
+  * `--instance-name INSTANCE_NAME`: The name for the instance.
+  * `--instance-iam-role-id INSTANCE_IAM_ROLE_ID`: The IAM role for the instance.
+  * `--instance-type INSTANCE_TYPE`: The instance type to use.
+  * `--key-pair-name KEY_PAIR_NAME`: The SSH Key Pair.
+  * `--security-group-id SECURITY_GROUP_ID`: The security group to apply.
+  * `--subnet-id SUBNET_ID`: The subnet for deployment.
 
-options:
-  -h, --help            show this help message and exit
-  --stack-name STACK_NAME
-                        Name of the CloudFormation stack (default: None)
-  --ami-id AMI_ID       AMI ID (default: None)
-  --instance-name INSTANCE_NAME
-                        Instance Name (default: None)
-  --instance-iam-role-id INSTANCE_IAM_ROLE_ID
-                        Instance IAM Role Name or ARN (default: None)
-  --instance-type INSTANCE_TYPE
-                        Instance Type (default: None)
-  --key-pair-name KEY_PAIR_NAME
-                        Key Pair Name (default: None)
-  --security-group-id SECURITY_GROUP_ID
-                        Comma separated list of Security Group IDs (default: None)
-  --subnet-id SUBNET_ID
-                        Subnet ID (default: None)
+#### **Example Command**
 
-
+```bash
+./envoi-virtual-desktops envoi development-windows \
+  --stack-name windows-dev-desktop \
+  --ami-id ami-01234567890abcdef \
+  --instance-name windows-desktop-1 \
+  --instance-type g4dn.xlarge \
+  --key-pair-name my-windows-key \
+  --security-group-id sg-0123456789abcdef0 \
+  --subnet-id subnet-0123456789abcdef0
 ```
 
-```shell
-envoi-virtual-desktops hp-anyware unreal-engine-5 --stack-name STACK_NAME --instance-type-size INSTANCE_TYPE_SIZE --vpc-cidr VPC_CIDR --subnet-cidr SUBNET_CIDR --allow-admin-cidr ALLOW_ADMIN_CIDR --allow-client-cidr ALLOW_CLIENT_CIDR --template-url TEMPLATE_URL
+-----
+
+### DaVinci Resolve Windows Server 2025 for NVIDIA with HP Anyware
+
+This command deploys a highly specialized virtual desktop using **HP Anyware** for high-performance remote access. It is built on a Windows Server with NVIDIA GPUs and is optimized for graphically intensive tasks.
+
+#### **Command-Line Arguments**
+
+  * `--stack-name STACK_NAME`: **(Required)** A unique name for the CloudFormation stack.
+  * `--instance-type-size INSTANCE_TYPE_SIZE`: The specific EC2 instance type, typically a GPU instance.
+  * `--vpc-cidr VPC_CIDR`: The CIDR block for the new Virtual Private Cloud (VPC) to be created.
+  * `--subnet-cidr SUBNET_CIDR`: The CIDR block for the new subnet.
+  * `--allow-admin-cidr ALLOW_ADMIN_CIDR`: The CIDR block for the IP range of administrators who need SSH access.
+  * `--allow-client-cidr ALLOW_CLIENT_CIDR`: The CIDR block for the IP range of remote clients who will connect using HP Anyware.
+  * `--template-url TEMPLATE_URL`: The URL of the CloudFormation template to use.
+
+#### **Example Command**
+
+```bash
+./envoi-virtual-desktops hp-anyware windows-2019-nvidia \
+  --stack-name resolve-windows-anyware \
+  --instance-type-size g4dn.2xlarge \
+  --vpc-cidr 10.0.0.0/16 \
+  --subnet-cidr 10.0.1.0/24 \
+  --allow-admin-cidr 203.0.113.0/24 \
+  --allow-client-cidr 198.51.100.0/24
 ```
 
-
-### ### Davince Resolve Windows Server 2025 for NVIDIA with HP Anyware
-
-```text
-
-./envoi-virtual-desktops hp-anyware windows-2019-nvidia --help
-usage: envoi-virtual-desktops hp-anyware windows-2019-nvidia [-h] --stack-name STACK_NAME [--instance-type-size INSTANCE_TYPE_SIZE] [--vpc-cidr VPC_CIDR] [--subnet-cidr SUBNET_CIDR]
-                                                             [--allow-admin-cidr ALLOW_ADMIN_CIDR] [--allow-client-cidr ALLOW_CLIENT_CIDR] [--template-url TEMPLATE_URL]
-
-options:
-  -h, --help            show this help message and exit
-  --stack-name STACK_NAME
-                        Name of the CloudFormation stack (default: None)
-  --instance-type-size INSTANCE_TYPE_SIZE
-                        Instance Type (default: None)
-  --vpc-cidr VPC_CIDR   VPC CIDR (default: None)
-  --subnet-cidr SUBNET_CIDR
-                        Subnet CIDR (default: None)
-  --allow-admin-cidr ALLOW_ADMIN_CIDR
-                        Allow Admin CIDR (default: None)
-  --allow-client-cidr ALLOW_CLIENT_CIDR
-                        Allow Client CIDR (default: None)
-  --template-url TEMPLATE_URL
-                        Path to the CloudFormation template (default: https://envoi-prod-files-public.s3.amazonaws.com/aws/cloud-formation/templates/hp-anyware/hp-anyware-windows-2019-nvidia-23.12.2.template)
-
-```
-
-```shell
-./envoi-virtual-desktops hp-anyware windows-2019-nvidia --stack-name STACK_NAME --instance-type-size INSTANCE_TYPE_SIZE --vpc-cidr VPC_CIDR --subnet-cidr SUBNET_CIDR
-                                                             --allow-admin-cidr ALLOW_ADMIN_CIDR --allow-client-cidr ALLOW_CLIENT_CIDR
-```
-
-
-
+-----
 
 ### Linux workstations with Nice DCV
 
-```text
-./envoi-virtual-desktops nice-dcv centos-7 --help
-usage: envoi-virtual-desktops hp-anyware centos-7 [-h] --stack-name STACK_NAME [--instance-type-size INSTANCE_TYPE_SIZE] [--vpc-cidr VPC_CIDR] [--subnet-cidr SUBNET_CIDR]
-                                                  [--allow-admin-cidr ALLOW_ADMIN_CIDR] [--allow-client-cidr ALLOW_CLIENT_CIDR] [--template-url TEMPLATE_URL]
+This command deploys a Linux virtual desktop using **Nice DCV** for high-performance remote access.
 
-options:
-  -h, --help            show this help message and exit
-  --stack-name STACK_NAME
-                        Name of the CloudFormation stack (default: None)
-  --instance-type-size INSTANCE_TYPE_SIZE
-                        Instance Type (default: None)
-  --vpc-cidr VPC_CIDR   VPC CIDR (default: None)
-  --subnet-cidr SUBNET_CIDR
-                        Subnet CIDR (default: None)
-  --allow-admin-cidr ALLOW_ADMIN_CIDR
-                        Allow Admin CIDR (default: None)
-  --allow-client-cidr ALLOW_CLIENT_CIDR
-                        Allow Client CIDR (default: None)
-  --template-url TEMPLATE_URL
-                        Path to the CloudFormation template (default: https://envoi-prod-files-public.s3.amazonaws.com/aws/cloud-formation/templates/hp-anyware/hp-anyware-centos-7-23.12.2.template)
+#### **Command-Line Arguments**
 
+  * `--stack-name STACK_NAME`: **(Required)** A unique name for the CloudFormation stack.
+  * `--instance-type-size INSTANCE_TYPE_SIZE`: The EC2 instance type to launch.
+  * `--vpc-cidr VPC_CIDR`: The CIDR block for the VPC.
+  * `--subnet-cidr SUBNET_CIDR`: The CIDR block for the subnet.
+  * `--allow-admin-cidr ALLOW_ADMIN_CIDR`: The CIDR block for administrator access.
+  * `--allow-client-cidr ALLOW_CLIENT_CIDR`: The CIDR block for remote client connections.
+  * `--template-url TEMPLATE_URL`: The URL of the CloudFormation template.
+
+#### **Example Command**
+
+```bash
+./envoi-virtual-desktops nice-dcv centos-7 \
+  --stack-name dcv-linux-desktop \
+  --instance-type-size g4dn.2xlarge \
+  --vpc-cidr 10.0.0.0/16 \
+  --subnet-cidr 10.0.1.0/24 \
+  --allow-admin-cidr 203.0.113.0/24 \
+  --allow-client-cidr 198.51.100.0/24 \
+  --template-url https://envoi-prod-files-public.s3.amazonaws.com/aws/cloud-formation/templates/nice-dcv/nice-dcv-centos-7.template
 ```
 
-```shell
-./envoi-virtual-desktops nice-dcv centos-7 --stack-name STACK_NAME --instance-type-size INSTANCE_TYPE_SIZE --vpc-cidr VPC_CIDR --subnet-cidr SUBNET_CIDR --allow-admin-cidr ALLOW_ADMIN_CIDR --allow-client-cidr ALLOW_CLIENT_CIDR --template-url TEMPLATE_URL
-
-```
+-----
 
 ### Unreal Engine 5 Windows Server 2025 with Nice DCV
 
+This command provisions a virtual desktop tailored for **Unreal Engine 5** on a Windows Server using **Nice DCV**.
 
-```text
+#### **Command-Line Arguments**
 
-./envoi-virtual-desktops nice-dcv unreal-engine-5 --help 
-usage: envoi-virtual-desktops hp-anyware unreal-engine-5 [-h] --stack-name STACK_NAME [--instance-type-size INSTANCE_TYPE_SIZE] [--vpc-cidr VPC_CIDR] [--subnet-cidr SUBNET_CIDR]
-                                                         [--allow-admin-cidr ALLOW_ADMIN_CIDR] [--allow-client-cidr ALLOW_CLIENT_CIDR] [--template-url TEMPLATE_URL]
+  * `--stack-name STACK_NAME`: **(Required)** A unique name for the CloudFormation stack.
+  * `--instance-type-size INSTANCE_TYPE_SIZE`: The EC2 instance type to launch, typically a high-end GPU instance.
+  * `--vpc-cidr VPC_CIDR`: The CIDR block for the VPC.
+  * `--subnet-cidr SUBNET_CIDR`: The CIDR block for the subnet.
+  * `--allow-admin-cidr ALLOW_ADMIN_CIDR`: The CIDR block for administrator access.
+  * `--allow-client-cidr ALLOW_CLIENT_CIDR`: The CIDR block for remote client connections.
+  * `--template-url TEMPLATE_URL`: The URL of the CloudFormation template.
 
-options:
-  -h, --help            show this help message and exit
-  --stack-name STACK_NAME
-                        Name of the CloudFormation stack (default: None)
-  --instance-type-size INSTANCE_TYPE_SIZE
-                        Instance Type (default: None)
-  --vpc-cidr VPC_CIDR   VPC CIDR (default: None)
-  --subnet-cidr SUBNET_CIDR
-                        Subnet CIDR (default: None)
-  --allow-admin-cidr ALLOW_ADMIN_CIDR
-                        Allow Admin CIDR (default: None)
-  --allow-client-cidr ALLOW_CLIENT_CIDR
-                        Allow Client CIDR (default: None)
-  --template-url TEMPLATE_URL
-                        Path to the CloudFormation template (default: https://envoi-prod-files-public.s3.amazonaws.com/aws/cloud-formation/templates/hp-anyware/hp-anyware-unreal-engine-5-23.12.2.template
+#### **Example Command**
 
-
+```bash
+./envoi-virtual-desktops nice-dcv unreal-engine-5 \
+  --stack-name unreal-engine-dcv-desktop \
+  --instance-type-size g4dn.2xlarge \
+  --vpc-cidr 10.0.0.0/16 \
+  --subnet-cidr 10.0.1.0/24 \
+  --allow-admin-cidr 203.0.113.0/24 \
+  --allow-client-cidr 198.51.100.0/24 \
+  --template-url https://envoi-prod-files-public.s3.amazonaws.com/aws/cloud-formation/templates/nice-dcv/nice-dcv-unreal-engine-5.template
 ```
 
-```shell
-envoi-virtual-desktops nice-dcv unreal-engine-5 --stack-name STACK_NAME --instance-type-size INSTANCE_TYPE_SIZE --vpc-cidr VPC_CIDR --subnet-cidr SUBNET_CIDR --allow-admin-cidr ALLOW_ADMIN_CIDR --allow-client-cidr ALLOW_CLIENT_CIDR --template-url TEMPLATE_URL
-```
-
+-----
 
 ### Windows Server 2025 NVIDIA with Nice DCV
 
-```text
+This command provisions a standard Windows virtual desktop with NVIDIA GPU drivers and **Nice DCV** for remote access.
 
-./envoi-virtual-desktops nice-dcv windows-2019-nvidia --help
-usage: envoi-virtual-desktops hp-anyware windows-2019-nvidia [-h] --stack-name STACK_NAME [--instance-type-size INSTANCE_TYPE_SIZE] [--vpc-cidr VPC_CIDR] [--subnet-cidr SUBNET_CIDR]
-                                                             [--allow-admin-cidr ALLOW_ADMIN_CIDR] [--allow-client-cidr ALLOW_CLIENT_CIDR] [--template-url TEMPLATE_URL]
+#### **Command-Line Arguments**
 
-options:
-  -h, --help            show this help message and exit
-  --stack-name STACK_NAME
-                        Name of the CloudFormation stack (default: None)
-  --instance-type-size INSTANCE_TYPE_SIZE
-                        Instance Type (default: None)
-  --vpc-cidr VPC_CIDR   VPC CIDR (default: None)
-  --subnet-cidr SUBNET_CIDR
-                        Subnet CIDR (default: None)
-  --allow-admin-cidr ALLOW_ADMIN_CIDR
-                        Allow Admin CIDR (default: None)
-  --allow-client-cidr ALLOW_CLIENT_CIDR
-                        Allow Client CIDR (default: None)
-  --template-url TEMPLATE_URL
-                        Path to the CloudFormation template (default: https://envoi-prod-files-public.s3.amazonaws.com/aws/cloud-formation/templates/hp-anyware/hp-anyware-windows-2019-nvidia-23.12.2.template)
+  * `--stack-name STACK_NAME`: **(Required)** A unique name for the CloudFormation stack.
+  * `--instance-type-size INSTANCE_TYPE_SIZE`: The EC2 instance type to launch.
+  * `--vpc-cidr VPC_CIDR`: The CIDR block for the VPC.
+  * `--subnet-cidr SUBNET_CIDR`: The CIDR block for the subnet.
+  * `--allow-admin-cidr ALLOW_ADMIN_CIDR`: The CIDR block for administrator access.
+  * `--allow-client-cidr ALLOW_CLIENT_CDR`: The CIDR block for remote client connections.
+  * `--template-url TEMPLATE_URL`: The URL of the CloudFormation template.
 
+#### **Example Command**
+
+```bash
+./envoi-virtual-desktops nice-dcv windows-2019-nvidia \
+  --stack-name dcv-windows-desktop \
+  --instance-type-size g4dn.2xlarge \
+  --vpc-cidr 10.0.0.0/16 \
+  --subnet-cidr 10.0.1.0/24 \
+  --allow-admin-cidr 203.0.113.0/24 \
+  --allow-client-cidr 198.51.100.0/24 \
+  --template-url https://envoi-prod-files-public.s3.amazonaws.com/aws/cloud-formation/templates/nice-dcv/nice-dcv-windows-2019-nvidia.template
 ```
-
-```shell
-./envoi-virtual-desktops nice-dcv windows-2019-nvidia --stack-name STACK_NAME --instance-type-size INSTANCE_TYPE_SIZE --vpc-cidr VPC_CIDR --subnet-cidr SUBNET_CIDR
-                                                             --allow-admin-cidr ALLOW_ADMIN_CIDR --allow-client-cidr ALLOW_CLIENT_CIDR
-```
-
-
