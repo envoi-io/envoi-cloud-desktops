@@ -41,6 +41,63 @@ This command provisions an **Apple Mac instance** on AWS, which is essential for
 
 -----
 
+# AWS EC2 macOS Provisioning Script
+
+This bash script simplifies the process of launching a macOS EC2 instance on a dedicated host in AWS. It interactively guides you through the required steps, from selecting a region and instance type to configuring your network and security settings, to finally allocating a dedicated host and launching the instance.
+
+### Features
+
+  * **Interactive Menus**: Select your AWS Region and Mac Instance Type from a list.
+  * **Availability Check**: Automatically checks for available instance offerings in each Availability Zone (AZ).
+  * **Guided Setup**: Prompts you for VPC, subnet, and key pair details.
+  * **Pre-execution Review**: Displays the exact AWS CLI commands that will be executed before you confirm deployment.
+  * **Resource Provisioning**: Handles both the **allocation of a dedicated host** and the **launch of the EC2 instance**.
+
+### Prerequisites
+
+1.  **AWS CLI**: Ensure the AWS Command Line Interface is installed and configured with appropriate credentials. You can download it [here](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html).
+2.  **IAM Permissions**: Your AWS user or role must have permissions to perform the following actions:
+      * `ec2:Describe*`
+      * `ec2:AllocateHosts`
+      * `ec2:RunInstances`
+3.  **Required Tools**: The script relies on standard Linux/macOS command-line tools such as `grep`, `awk`, and `cut`.
+
+### Setup and Usage
+
+1.  **Save the Script**: Save the provided script to a file, for example, `mac-provisioner.sh`.
+
+2.  **Make it Executable**: Give the script execute permissions.
+
+    ```bash
+    chmod +x deploy-ec2-mac.sh
+    ```
+
+3.  **Update Variables**: Open the script and update the following environment variables at the top of the file with your specific information:
+
+      * `AWS_PROFILE`: Your AWS CLI profile name.
+      * `AWS_EC2_SECURITY_GROUP_ID`: The ID of the security group you wish to use.
+
+4.  **Run the Script**: Execute the script from your terminal.
+
+    ```bash
+    ./deploy-ec2-mac.sh
+    ```
+
+### Interactive Prompts
+
+The script will walk you through a series of prompts. Here's what to expect:
+
+1.  **Region Selection**: Choose the AWS region where you want to deploy the macOS instance.
+2.  **Instance Type**: Select the Mac instance type (e.g., `mac1.metal`, `mac2.metal`).
+3.  **Availability Zone**: The script will list available AZs and prompt you to choose one.
+4.  **VPC and Subnet**: A list of available VPCs and their associated subnets will be displayed. You must choose a VPC and a subnet for the instance.
+5.  **Key Pair**: Select an existing EC2 Key Pair to use for SSH access to the instance.
+6.  **User Data (Optional)**: Provide an optional user data file path for instance initialization.
+
+After completing the prompts, the script will echo the `aws ec2 allocate-hosts` and `aws ec2 run-instances` commands for your review before asking for final confirmation to proceed with the deployment.
+
+-----
+
 ### DaVinci Resolve Linux Development Workstations
 
 This command launches a Linux-based virtual desktop optimized for **DaVinci Resolve**, a professional video editing application. It uses a **CloudFormation stack** for streamlined deployment.
@@ -213,3 +270,5 @@ This command provisions a standard Windows virtual desktop with NVIDIA GPU drive
   --allow-client-cidr 198.51.100.0/24 \
   --template-url https://envoi-prod-files-public.s3.amazonaws.com/aws/cloud-formation/templates/nice-dcv/nice-dcv-windows-2019-nvidia.template
 ```
+
+To create a `README.md` for this script, you'll want to include a clear title, a brief description, instructions for installation and setup, and a usage example. I'll also add sections for the script's features and an explanation of the user prompts.
