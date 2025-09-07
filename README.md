@@ -41,7 +41,7 @@ This command provisions an **Apple Mac instance** on AWS, which is essential for
 
 -----
 
-# AWS EC2 macOS Provisioning Script
+### AWS EC2 macOS Provisioning Script
 
 This bash script simplifies the process of launching a macOS EC2 instance on a dedicated host in AWS. It interactively guides you through the required steps, from selecting a region and instance type to configuring your network and security settings, to finally allocating a dedicated host and launching the instance.
 
