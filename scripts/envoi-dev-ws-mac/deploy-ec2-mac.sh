@@ -20,8 +20,8 @@ declare -A INSTANCE_TYPES
 INSTANCE_TYPES[1]="mac1.metal"
 INSTANCE_TYPES[2]="mac2.metal"
 INSTANCE_TYPES[3]="mac2-m1ultra.metal"
-INSTANCES_TYPES[4]="mac2-m2.metal"
-INSTANCES_TYPES[5]="mac2-m2pro.metal"
+INSTANCE_TYPES[4]="mac2-m2.metal"
+INSTANCE_TYPES[5]="mac2-m2pro.metal"
 
 # Function to display the region menu
 function show_region_menu() {
@@ -43,6 +43,8 @@ function show_instance_menu() {
   echo "3) mac2-m1ultra.metal (2022 Mac Studio, Apple silicon M1 Ultra, 128 GiB unified memory)"
   echo "4) mac2-m2.metal (2023 Mac mini, Apple silicon M2, 24 GiB unified memory)"
   echo "5) mac2-m2pro.metal (2023 Mac mini, Apple silicon M2 Pro, 32 GiB unified memory)"
+  echo "6) mac-m4.metal (2024 Mac mini, Apple silicon M4, 10‑core GPU, 24GB unified memory, and 16‑core Neural Engine)"
+  echo "7) mac-m4pro.metal (2024 Mac mini, Apple silicon M4, 20‑core GPU, 48GB unified memory, and 16‑core Neural Engine)"
   echo "Enter the number of your choice:"
 }
 
