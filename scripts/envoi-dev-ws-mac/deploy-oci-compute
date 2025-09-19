@@ -1,0 +1,140 @@
+#!/bin/bash
+
+# Define variables
+COMPARTMENT_ID=""
+AVAILABILITY_DOMAIN=""
+IMAGE_ID=""
+SHAPE=""
+SSH_PUBLIC_KEY=""
+VCN_CIDR=""
+VCN_DNS_LABEL=""
+SUBNET_CIDR=""
+SUBNET_DNS_LABEL=""
+
+# ---
+# Create the Virtual Cloud Network (VCN)
+echo "Creating VCN..."
+VCN_OCID=$(oci network vcn create \
+    --compartment-id "$COMPARTMENT_ID" \
+    --cidr-block "$VCN_CIDR" \
+    --display-name "vcn-20250918-1914" \
+    --dns-label "$VCN_DNS_LABEL" \
+    --query 'data.id' --raw-output)
+
+echo "VCN OCID: $VCN_OCID"
+
+# Wait for the VCN to become available
+oci network vcn get --vcn-id "$VCN_OCID" --query 'data."lifecycle-state"' | grep "AVAILABLE" > /dev/null
+while [ $? -ne 0 ]; do
+    echo "Waiting for VCN to become available..."
+    sleep 5
+    oci network vcn get --vcn-id "$VCN_OCID" --query 'data."lifecycle-state"' | grep "AVAILABLE" > /dev/null
+done
+
+# ---
+# Create the Internet Gateway (IG)
+echo "Creating Internet Gateway..."
+IG_OCID=$(oci network internet-gateway create \
+    --compartment-id "$COMPARTMENT_ID" \
+    --vcn-id "$VCN_OCID" \
+    --display-name "Internet Gateway vcn-20250918-1914" \
+    --is-enabled true \
+    --query 'data.id' --raw-output)
+
+echo "Internet Gateway OCID: $IG_OCID"
+
+# ---
+# Get the default route table OCID from the VCN
+echo "Getting default route table OCID..."
+DEFAULT_ROUTE_TABLE_OCID=$(oci network vcn get \
+    --vcn-id "$VCN_OCID" \
+    --query 'data."default-route-table-id"' \
+    --raw-output)
+
+echo "Default Route Table OCID: $DEFAULT_ROUTE_TABLE_OCID"
+
+# ---
+# Add a route rule to the default route table
+echo "Updating default route table with route rule..."
+oci network route-table update \
+    --rt-id "$DEFAULT_ROUTE_TABLE_OCID" \
+    --route-rules "[{\"cidrBlock\":\"0.0.0.0/0\",\"networkEntityId\":\"$IG_OCID\"}]" \
+    --force
+
+# ---
+# Create the Subnet
+echo "Creating Subnet..."
+SUBNET_OCID=$(oci network subnet create \
+    --compartment-id "$COMPARTMENT_ID" \
+    --vcn-id "$VCN_OCID" \
+    --cidr-block "$SUBNET_CIDR" \
+    --display-name "subnet-20250918-1914" \
+    --dns-label "$SUBNET_DNS_LABEL" \
+    --route-table-id "$DEFAULT_ROUTE_TABLE_OCID" \
+    --query 'data.id' --raw-output)
+
+echo "Subnet OCID: $SUBNET_OCID"
+
+# Wait for the Subnet to become available
+oci network subnet get --subnet-id "$SUBNET_OCID" --query 'data."lifecycle-state"' | grep "AVAILABLE" > /dev/null
+while [ $? -ne 0 ]; do
+    echo "Waiting for Subnet to become available..."
+    sleep 5
+    oci network subnet get --subnet-id "$SUBNET_OCID" --query 'data."lifecycle-state"' | grep "AVAILABLE" > /dev/null
+done
+
+# ---
+# Define a variable for the user data script file
+USER_DATA_SCRIPT="user_data_script.sh"
+
+# Create a sample user data script file
+cat > "$USER_DATA_SCRIPT" << EOF
+#!/bin/bash
+sudo yum update -y
+sudo yum install httpd -y
+sudo systemctl enable httpd
+sudo systemctl start httpd
+echo "Hello from a user data script!" | sudo tee /var/www/html/index.html
+EOF
+
+# Create the Compute Instance with the user data script
+echo "Creating Compute Instance with user data script..."
+oci compute instance launch \
+    --compartment-id "$COMPARTMENT_ID" \
+    --availability-domain "$AVAILABILITY_DOMAIN" \
+    --shape "$SHAPE" \
+    --display-name "instance-20250918-1910" \
+    --image-id "$IMAGE_ID" \
+    --ssh-authorized-keys "$SSH_PUBLIC_KEY" \
+    --subnet-id "$SUBNET_OCID" \
+    --assign-public-ip true \
+    --assign-private-dns-record true \
+    --is-pv-encryption-in-transit-enabled true \
+    --user-data-file "$USER_DATA_SCRIPT" \
+    --agent-config '{
+        "isManagementDisabled": false,
+        "isMonitoringDisabled": false,
+        "pluginsConfig": [
+            {
+                "desiredState": "ENABLED",
+                "name": "Compute Instance Monitoring"
+            },
+            {
+                "desiredState": "ENABLED",
+                "name": "Compute Instance Run Command"
+            },
+            {
+                "desiredState": "ENABLED",
+                "name": "Cloud Guard Workload Protection"
+            },
+            {
+                "desiredState": "ENABLED",
+                "name": "Custom Logs Monitoring"
+            }
+        ]
+    }' \
+    --boot-volume-size-in-gbs 50 \
+    --boot-volume-vpus-per-gb 10
+
+# Clean up the temporary user data script file
+rm "$USER_DATA_SCRIPT"
