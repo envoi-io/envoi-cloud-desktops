@@ -128,6 +128,7 @@ download_and_install_dmg "AWS Deadline Cloud Monitor" \
 
 install_app "brew install aws-sam-cli" "AWS SAM CLI"
 install_app "brew install azure-cli" "Azure CLI"
+install_app "brew install oci-cli" "Oracle Cloud CLI"
 install_app "brew install cassandra" "Cassandra"
 install_app "brew install carthage" "Carthage"
 install_app "brew install cocoapods" "Cocoapods"
