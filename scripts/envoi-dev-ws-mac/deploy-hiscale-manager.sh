@@ -317,6 +317,3 @@ echo "EC2 Instance launched with ID: $INSTANCE_ID"
 echo "The instance is being provisioned. The FLICS prerequisites are being installed automatically via User Data."
 echo "Once the instance is in the 'running' state, you can connect to it."
 
-***
-
-Would you like me to walk you through a step-by-step example of how to set up and use the new environment variables for an automated deployment?
