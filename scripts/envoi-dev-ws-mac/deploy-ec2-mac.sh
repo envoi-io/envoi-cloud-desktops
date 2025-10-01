@@ -22,6 +22,8 @@ INSTANCE_TYPES[2]="mac2.metal"
 INSTANCE_TYPES[3]="mac2-m1ultra.metal"
 INSTANCE_TYPES[4]="mac2-m2.metal"
 INSTANCE_TYPES[5]="mac2-m2pro.metal"
+INSTANCE_TYPES[6]="mac-m4.metal"
+INSTANCE_TYPES[7]="mac-m4pro.metal"
 
 # Function to display the region menu
 function show_region_menu() {
